@@ -14,9 +14,11 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
 
     private final LayoutInflater mInflater;
     private List<Word> mWords;
+    private OnWordClickListener mWordClickListener;
 
-    public WordListAdapter(Context context) {
+    public WordListAdapter(Context context, OnWordClickListener wordClickListener) {
         mInflater = LayoutInflater.from(context);
+        this.mWordClickListener = wordClickListener;
     }
 
 
@@ -24,7 +26,7 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
     @Override
     public WordViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = mInflater.inflate(R.layout.recyclerview_item, viewGroup, false);
-        return new WordViewHolder(itemView);
+        return new WordViewHolder(itemView, mWordClickListener);
     }
 
     @Override
@@ -39,6 +41,10 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
 
     }
 
+    public List<Word> getWords() {
+        return mWords;
+    }
+
     void setWords(List<Word> words) {
         mWords = words;
         notifyDataSetChanged();
@@ -51,14 +57,27 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordVi
         else return 0;
     }
 
-    class WordViewHolder extends RecyclerView.ViewHolder {
+    public Word getWordAtPosition(int position) {
+        return mWords.get(position);
+    }
+
+    class WordViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final TextView wordItemView;
+        OnWordClickListener wordClickListener;
 
-        public WordViewHolder(@NonNull View itemView) {
+        public WordViewHolder(@NonNull View itemView, OnWordClickListener wordClickListener) {
             super(itemView);
 
             wordItemView = itemView.findViewById(R.id.textView);
+            this.wordClickListener = wordClickListener;
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            wordClickListener.onWordClick(getAdapterPosition());
         }
     }
 }
